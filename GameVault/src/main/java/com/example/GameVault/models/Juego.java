@@ -13,12 +13,13 @@ import lombok.NoArgsConstructor;
 
 public class Juego {
     @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
         private String titulo;
 
-    @Column(lenght = 1000)
+    @Column(length = 1000)
         private String descripcion = "descripcion";
 
     @Column(name = "portada_url")

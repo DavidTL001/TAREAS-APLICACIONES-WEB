@@ -1,6 +1,8 @@
 package com.example.GameVault.controllers;
 
 import com.example.GameVault.models.Juego;
+import com.example.GameVault.service.JuegoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import static jakarta.persistence.GenerationType.UUID;
+
 
 @Controller
 public class GameController {
+
+    @Autowired
+    private JuegoService juegoService;
     private static List<Juego> juegosDb = new ArrayList<>();
     private static long idCounter = 1;
 
@@ -35,8 +40,16 @@ public class GameController {
     public String fragmentsDemo(){ return "fragments-demo";}
 
     @GetMapping({"/", "/juegos"})
-    public String listarJuegos(Model model) {
-        model.addAttribute("juegos", juegosDb);
+    public String listarJuegos( @RequestParam(name="buscar", required = false) String buscar, Model model){
+        if (buscar != null && !buscar.isEmpty()){
+
+            model.addAttribute("juegos", juegoService.buscarPorTitulo(buscar));
+            model.addAttribute("busquedaActual", buscar);
+
+        }else{
+            model.addAttribute("juegos", juegoService.obtenerTodos());
+        }
+
         return "juegos";
     }
 
@@ -47,33 +60,16 @@ public class GameController {
     public String guardarJuego(@RequestParam("titulo") String titulo,
                                @RequestParam("descripcion") String descripcion,
                                 @RequestParam("portada") MultipartFile portada){
-        String nombreArchivo = "default.png";
 
-        if (!portada.isEmpty()){
-            try{
-                Path uploadPath = Paths.get(UPLOAD_DIR);
-                if (!Files.exists(uploadPath)) {
-
-                    Files.createDirectories(uploadPath);
-                }
-
-                nombreArchivo = UUID.randomUUID().toString + "_" + portada.getOriginalFilename();
-                Path filePath = uploadPath.resolve(nombreArchivo);
-
-                Files.copy(portada.getInputStream(), filePath);
-                System.out.println("Archivo guardado en: " + filePath.toAbsolutePath());
-               } catch(IOException e){
-                    e.printStackTrace();
-            }
-        }
-
-        Juego nuevoJuego = new Juego(idCounter++, titulo, decripcion, nombreArchivo);
-        juegosDb.add(nuevoJuego);
-
+        Juego nuevoJuego = new Juego();
+        nuevoJuego.setTitulo(titulo);
+        nuevoJuego.setDescripcion(descripcion);
+        juegoService.guardarJuego(nuevoJuego, portada);
         return "redirect:/juegos";
 
-
-
     }
+
+
+
 
 }

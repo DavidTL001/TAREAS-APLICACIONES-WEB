@@ -5,6 +5,18 @@
             <h2 class="text-gradient">Catálogo de Juegos</h2>
             <a th:href="@{/juegos/nuevo}" class="btn btn-primary">+ Nuevo Juego</a>
         </div>
+            <!-- Barra de busqueda-->
+            <div style="margin-bottom: 30px;">
+                <form action="/juegos" method="get" style="display: flex; gap: 10px;">
+                    <input type="text" name="buscar"
+                        th:value="${busquedaactual}" placeholder="Buscar juego por titulo..."
+                        style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid  var(--bg-panel); color: white;" >
+                    <button type="submit" class="btn btn-secondary">Buscar</button>
+                    <a th:if="${busquedaActual != null}" href="/juegos" class="btn btn-secondary" style="background: var(--bg-panel);">Limpiar</a>
+                </form>
+
+
+            </div>
     
         <div class="grid">
         
